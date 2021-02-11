@@ -1,0 +1,19 @@
+import pandas as pd
+from sklearn import model_selection
+
+
+#this would execute when the code is run
+if __name__ == "__main__":
+    df = pd.read_csv("../input/train.csv")
+    print("Number of data points is  {num}".format(num = len(df)))
+    df['kfold'] = -1
+
+    #shuffle the data
+    df.sample(frac=1).reset_index(drop=True)
+    kf = model_selection.StratifiedKFold(n_splits=5, shuffle=False)
+
+    for fold, (train_idx, val_idx) in enumerate(kf.split(X=df,y=df.target.values)):
+        print(len(train_idx), len(val_idx))
+        df.loc[val_idx, 'kfold'] = fold
+
+    df.to_csv('../input/train_folds.csv', index=False)
